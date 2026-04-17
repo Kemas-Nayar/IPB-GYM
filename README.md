@@ -90,7 +90,7 @@ git pull origin main
 **2. Gunakan Branch Baru**  
 Jangan langsung coding di `main`. Buat branch fitur sendiri:
 ```bash
-git checkout -b fitur-login-nadine
+git checkout -b fitur-login-prima
 ```
 
 **3. Commit dengan Pesan yang Jelas**
