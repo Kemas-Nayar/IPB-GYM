@@ -9,10 +9,9 @@ Proyek Mata Kuliah KOM 1231 Rekayasa Perangkat Lunak (RPL) Semester Genap 2025/2
 
 | Nama | Peran |
 |------|-------|
+| **Prima Jaya Kusumah** | — |
 | **Kemas Adirangga Nayar** | Lead / Database & Backend |
-| **Nadine Putri Agustin** | — |
-| **Julius Calvin Kurniadi** | — |
-| **Gilang Muhamad Widiagung** | — |
+| **Muhammad Wafi Robbani** | — |
 
 ---
 
