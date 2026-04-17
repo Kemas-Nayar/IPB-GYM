@@ -1,33 +1,107 @@
 # 🏋️‍♂️ IPB Wellness Hub
 
-Sistem Reservasi dan Monitoring Kuota Gym IPB. 
-Proyek ini dikembangkan untuk memenuhi tugas mata kuliah **KOM 1231 Rekayasa Perangkat Lunak**.
-
-## 🛠️ Tech Stack
-* **Framework:** Next.js 15 (App Router)
-* **Language:** TypeScript
-* **Styling:** Tailwind CSS
-* **Database & Auth:** Supabase (PostgreSQL)
+Sistem Informasi Reservasi dan Monitoring Kuota Gym IPB.  
+Proyek Mata Kuliah KOM 1231 Rekayasa Perangkat Lunak (RPL) Semester Genap 2025/2026.
 
 ---
 
-## 🚀 Cara Menjalankan Proyek di Lokal
+## 👥 Kelompok 5
 
-Bagi anggota tim yang baru melakukan *clone* repositori ini, ikuti langkah-langkah berikut agar aplikasi bisa berjalan di laptop masing-masing:
+| Nama | Peran |
+|------|-------|
+| **Kemas Adirangga Nayar** | Lead / Database & Backend |
+| **Nadine Putri Agustin** | — |
+| **Julius Calvin Kurniadi** | — |
+| **Gilang Muhamad Widiagung** | — |
 
-### 1. Prasyarat
-Pastikan kamu sudah menginstal:
-* [Node.js](https://nodejs.org/) (versi 18.x atau terbaru)
-* Git
+---
 
-### 2. Instalasi Dependensi
-Buka terminal di dalam folder proyek, lalu jalankan:
+## 🛠️ Tech Stack
+
+| Lapisan | Teknologi |
+|---------|-----------|
+| **Frontend** | Next.js 15 (App Router), TypeScript, Tailwind CSS |
+| **Backend/Database** | Supabase (PostgreSQL, Auth, SSR) |
+| **Deployment** | Vercel *(TBD)* |
+
+---
+
+## 🚀 Cara Menjalankan Proyek Secara Lokal
+
+Ikuti langkah-langkah berikut untuk mengatur *environment* pengembangan di laptop masing-masing.
+
+### 1. Clone Repositori
+
+Pastikan Git sudah terinstal, lalu jalankan:
+
 ```bash
-npm install```
+git clone https://github.com/Kemas-Nayar/ipb-wellness-hub.git
+cd ipb-wellness-hub
+```
 
-### 3. Setup Variabel Lingkungan (Environment Variables)
-⚠️ PERINGATAN: Jangan pernah git add .env.local atau push file ini ke GitHub!
-Minta credential (URL dan Anon Key) ke Kemas. Buat file baru bernama .env.local di root folder (sejajar dengan package.json), dan isi dengan format berikut:
+### 2. Install Dependencies
+
+Pastikan Node.js sudah terinstal, lalu jalankan:
+
 ```bash
+npm install
+```
+
+### 3. Setup Environment Variables
+
+> ⚠️ **Jangan pernah push kredensial ke GitHub!**
+
+Minta file konfigurasi ke Kemas. Buat file baru bernama `.env.local` di root folder (sejajar dengan `package.json`), lalu isi dengan:
+
+```env
 NEXT_PUBLIC_SUPABASE_URL=https://[PROJECT_ID].supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=[KODE_ANON_KEY_DARI_KEMAS]```
+NEXT_PUBLIC_SUPABASE_ANON_KEY=[KODE_ANON_KEY_DARI_KEMAS]
+```
+
+### 4. Setup Database (Supabase)
+
+Skema database sudah dirancang. Untuk melihat atau memperbarui struktur tabel, buka file SQL di:
+
+```
+supabase/migrations/20260417_init_schema.sql
+```
+
+> **Catatan:** Database utama sudah terhubung ke cloud Supabase. Selama `.env.local` sudah benar, kamu langsung terhubung ke database tanpa setup tambahan.
+
+### 5. Jalankan Development Server
+
+```bash
+npm run dev
+```
+
+Buka [http://localhost:3000](http://localhost:3000) di browser. Jika berhasil, kamu akan melihat dashboard jadwal gym IPB.
+
+---
+
+## ⚠️ Aturan Kolaborasi Git (Penting!)
+
+Untuk menghindari *merge conflict*, patuhi alur kerja berikut:
+
+**1. Selalu Pull Terbaru**  
+Sebelum mulai coding, jalankan:
+```bash
+git pull origin main
+```
+
+**2. Gunakan Branch Baru**  
+Jangan langsung coding di `main`. Buat branch fitur sendiri:
+```bash
+git checkout -b fitur-login-nadine
+```
+
+**3. Commit dengan Pesan yang Jelas**
+```bash
+git commit -m "feat: menambah tombol login SSO"
+```
+
+**4. Push & Pull Request (PR)**  
+Push ke branch kamu, lalu minta *review* dari anggota tim lain di GitHub sebelum di-*merge* ke `main`.
+
+---
+
+Selamat ngoding! 🚀
