@@ -9,11 +9,11 @@ Proyek Mata Kuliah KOM 1231 Rekayasa Perangkat Lunak (RPL) Semester Genap 2025/2
 
 ## 👥 Kelompok 4
 
-| Nama | Peran |
-|------|-------|
-| **Kemas Adirangga Nayar** | Database & Backend |
-| **Muhammad Wafi Robbani** | Frontend|
-| **Prima Jaya Kusuma** | Lead & Backend |
+| Nama | NIM | Peran |
+|------|-------|-------|
+| **Prima Jaya Kusuma** | M0403241106 | Lead & Backend |
+| **Kemas Adirangga Nayar** | M0403241043 | Database & Backend |
+| **Muhammad Wafi Robbani** | M0403241013 | Frontend |
 
 ---
 
