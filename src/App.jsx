@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "./supabase";
 import LoadingScreen from "./components/LoadingScreen";
 import LandingPage from "./components/LandingPage";
@@ -22,12 +22,9 @@ import QRScanPage from './components/QRScanPage';
 import "./styles/App.css";
 
 export default function App() {
-  // BUG FIX: authReady memisahkan "session sudah dicek" dari "loading animation selesai"
-  // Dulu: loading=false bisa dipicu oleh LoadingScreen (onFinish) SEBELUM getSession() selesai
-  // Akibatnya di mobile yang lambat, page masih 'landing' saat render pertama → keliatan logout
   const [authReady, setAuthReady] = useState(false);
   const [animDone, setAnimDone] = useState(false);
-  const [page, setPage] = useState(null); // null = belum tahu, hindari flash 'landing'
+  const [page, setPage] = useState(null);
   const [pageParams, setPageParams] = useState(null);
   const [user, setUser] = useState(null);
 
@@ -45,18 +42,14 @@ export default function App() {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
-
       if (session?.user) {
         const hasBiodata = await checkBiodata(session.user.id);
         setPage(hasBiodata ? 'home' : 'biodata');
       } else {
         setPage('landing');
       }
-
-      // Auth sudah dicek — boleh render sekarang (kalau animasi juga sudah selesai)
       setAuthReady(true);
     };
-
     getSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -79,10 +72,13 @@ export default function App() {
     setPageParams(params);
   };
 
-  // Tampilkan LoadingScreen sampai KEDUANYA selesai: auth dicek + animasi selesai
+  // useCallback supaya referensi fungsi stabil antar render.
+  // Tanpa ini, LoadingScreen useEffect([onFinish]) reset timer tiap render → layar putih.
+  const handleAnimDone = useCallback(() => setAnimDone(true), []);
+
   const showLoading = !authReady || !animDone;
   if (showLoading) {
-    return <LoadingScreen onFinish={() => setAnimDone(true)} />;
+    return <LoadingScreen onFinish={handleAnimDone} />;
   }
 
   return (
