@@ -1,16 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
+import { useChat } from 'ai/react';
 import doctorAvatar from '../assets/doctor_avatar.png';
 import '../styles/HealthAssistantPage.css';
 
 const HealthAssistantPage = ({ onNavigate, user }) => {
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      text: 'Tentu! Aku disini untuk membantumu! Apa yang mau kau tanyakan tentang kesehatanmu?',
-    },
-  ]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
+  // useChat menggantikan useState manual untuk messages, input, dan loading
+  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
+    api: '/api/chat', // Endpoint backend Vercel kita
+    initialMessages: [
+      {
+        id: 'welcome-message',
+        role: 'assistant',
+        content: 'Tentu! Aku disini untuk membantumu! Apa yang mau kau tanyakan tentang kesehatanmu?',
+      },
+    ],
+  });
+
   const bottomRef = useRef(null);
 
   const quickTopics = [
@@ -23,33 +28,12 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = async (text) => {
-    if (!text.trim()) return;
-    const userMsg = { role: 'user', text };
-    const newMessages = [...messages, userMsg];
-    setMessages(newMessages);
-    setInput('');
-    setLoading(true);
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: 'Kamu adalah Health Assistant bernama Nuri dari IPB Wellness Hub. Jawab pertanyaan seputar kesehatan, gizi, olahraga, dan gaya hidup sehat dalam Bahasa Indonesia. Jawab dengan ramah, singkat, dan informatif.',
-          messages: newMessages.map(m => ({ role: m.role, content: m.text })),
-        }),
-      });
-      const data = await response.json();
-      const reply = data.content?.[0]?.text || 'Maaf, aku tidak bisa menjawab saat ini.';
-      setMessages(prev => [...prev, { role: 'assistant', text: reply }]);
-    } catch {
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Maaf, terjadi kesalahan. Coba lagi ya!' }]);
-    } finally {
-      setLoading(false);
-    }
+  // Fungsi khusus untuk tombol Quick Topic agar langsung terkirim
+  const handleQuickTopic = (prompt) => {
+    append({
+      role: 'user',
+      content: prompt,
+    });
   };
 
   return (
@@ -69,18 +53,20 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
         <div className="ha-chat-area">
 
           {/* Messages */}
-          {messages.map((msg, i) => (
-            <div key={i} className={`ha-msg-row ${msg.role === 'user' ? 'ha-msg-user' : 'ha-msg-ai'}`}>
+          {messages.map((msg) => (
+            <div key={msg.id} className={`ha-msg-row ${msg.role === 'user' ? 'ha-msg-user' : 'ha-msg-ai'}`}>
               {msg.role === 'assistant' && (
                 <img src={doctorAvatar} className="ha-avatar" alt="AI" />
               )}
               <div className={`ha-bubble ${msg.role === 'assistant' ? 'ha-bubble-ai' : 'ha-bubble-user'}`}>
-                {msg.text}
+                {/* Vercel AI SDK menggunakan 'content', bukan 'text' */}
+                {msg.content} 
               </div>
             </div>
           ))}
 
-          {loading && (
+          {/* Loading Indicator */}
+          {isLoading && (
             <div className="ha-msg-row ha-msg-ai">
               <img src={doctorAvatar} className="ha-avatar" alt="AI" />
               <div className="ha-bubble ha-bubble-ai ha-typing">
@@ -95,24 +81,26 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
         {/* Quick Topics */}
         <div className="ha-quick-topics">
           {quickTopics.map((t, i) => (
-            <button key={i} className="ha-topic-btn" onClick={() => sendMessage(t.prompt)}>
+            <button key={i} className="ha-topic-btn" onClick={() => handleQuickTopic(t.prompt)} disabled={isLoading}>
               {t.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Input Bar */}
-      <div className="ha-input-bar">
+      {/* Input Bar - Diubah menjadi <form> agar handleSubmit berjalan native */}
+      <form className="ha-input-bar" onSubmit={handleSubmit}>
         <input
           className="ha-input"
           placeholder="Tulis pertanyaanmu..."
           value={input}
-          onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && sendMessage(input)}
+          onChange={handleInputChange}
+          disabled={isLoading}
         />
-        <button className="ha-send-btn" onClick={() => sendMessage(input)}>→</button>
-      </div>
+        <button type="submit" className="ha-send-btn" disabled={!input.trim() || isLoading}>
+          →
+        </button>
+      </form>
     </div>
   );
 };

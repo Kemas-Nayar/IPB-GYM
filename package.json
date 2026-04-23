@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.64",
     "@supabase/supabase-js": "^2.104.0",
+    "ai": "^6.0.168",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "recharts": "^3.8.1"
