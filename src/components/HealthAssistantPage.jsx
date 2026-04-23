@@ -8,7 +8,7 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
   const [error, setError] = useState(null);
 
   const { messages, input, setInput, handleInputChange, isLoading, append } = useChat({
-    api: '/api/chat',
+    api: 'https://backend-xyz.vercel.app/api/chat',
     initialMessages: [
       {
         id: 'welcome-message',
