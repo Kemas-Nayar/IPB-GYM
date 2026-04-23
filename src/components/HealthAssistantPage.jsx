@@ -5,7 +5,7 @@ import doctorAvatar from '../assets/doctor_avatar.png';
 import '../styles/HealthAssistantPage.css';
 
 const HealthAssistantPage = ({ onNavigate, user }) => {
-  const { messages, input, handleInputChange, isLoading, append } = useChat({
+  const { messages, input, setInput, handleInputChange, isLoading, append } = useChat({
     api: '/api/chat',
     initialMessages: [
       {
@@ -22,17 +22,26 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Fungsi helper agar logika pengiriman terpusat
-  const sendMessage = (text) => {
-    if (!text.trim() || isLoading) return;
+  // ✅ FIX: Ambil langsung dari state 'input' & proteksi undefined
+  const sendMessage = () => {
+    if (!input || !input.trim() || isLoading) return;
     
     append({
       role: 'user',
-      content: text,
+      content: input,
     });
 
-    // Reset input secara manual setelah append
-    handleInputChange({ target: { value: '' } });
+    // ✅ FIX: Gunakan setInput bawaan SDK untuk clear field
+    setInput('');
+  };
+
+  // ✅ Khusus Quick Topic tetap pakai parameter karena nilainya statis/luar state
+  const handleQuickTopic = (prompt) => {
+    if (isLoading) return;
+    append({
+      role: 'user',
+      content: prompt,
+    });
   };
 
   const quickTopics = [
@@ -43,7 +52,6 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
 
   return (
     <div className="ha-page">
-      {/* Header */}
       <div className="ha-header">
         <button className="ha-back-btn" onClick={() => onNavigate('home')}>←</button>
         <div className="ha-header-text">
@@ -53,7 +61,6 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
         <button className="ha-help-btn">?</button>
       </div>
 
-      {/* Chat Area */}
       <div className="ha-body">
         <div className="ha-chat-area">
           {messages.map((msg) => (
@@ -78,13 +85,12 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
           <div ref={bottomRef} />
         </div>
 
-        {/* Quick Topics */}
         <div className="ha-quick-topics">
           {quickTopics.map((t, i) => (
             <button 
               key={i} 
               className="ha-topic-btn" 
-              onClick={() => sendMessage(t.prompt)} 
+              onClick={() => handleQuickTopic(t.prompt)} 
               disabled={isLoading}
             >
               {t.label}
@@ -93,7 +99,6 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
         </div>
       </div>
 
-      {/* Input Bar (Div version) */}
       <div className="ha-input-bar">
         <input
           className="ha-input"
@@ -104,15 +109,15 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               e.preventDefault();
-              sendMessage(input);
+              sendMessage(); // ✅ Tanpa parameter
             }
           }}
         />
         <button
           type="button"
           className="ha-send-btn"
-          disabled={isLoading || !input.trim()}
-          onClick={() => sendMessage(input)}
+          disabled={isLoading || !input?.trim()} // ✅ Opsional chaining untuk amankan trim
+          onClick={sendMessage} // ✅ Langsung referensi fungsi
         >
           →
         </button>
