@@ -259,13 +259,24 @@ const GymReservationPage = ({ onNavigate, user }) => {
                     {sesi.nama_sesi}
                   </div>
                 </div>
-                <div style={{ textAlign: 'right', fontSize: '11px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                  {sesi.penuh ? (
-                    <span style={{ color: '#d32f2f', fontWeight: 'bold' }}>PENUH</span>
-                  ) : (
-                    <span>Sisa: {sesi.sisa_kuota} slot</span>
-                  )}
-                </div>
+
+            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              {sesi.penuh ? (
+                <span style={{ color: '#d32f2f', fontWeight: 'bold', fontSize: '12px' }}>KOUTA PENUH</span>
+              ) : (
+                <>
+                  {/* Menampilkan jumlah terisi / kapasitas maksimal */}
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#333' }}>
+                    👤 {sesi.terisi} / {sesi.kapasitas_max} Terisi
+                  </span>
+                  {/* Menampilkan sisa slot di bawahnya */}
+                  <span style={{ fontSize: '10px', color: '#2e7d32', marginTop: '2px' }}>
+                    Sisa {sesi.sisa_kuota} slot
+                  </span>
+                </>
+              )}
+            </div>
+
               </button>
             ))
           )}
