@@ -145,6 +145,17 @@
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   color: #1a1a1a;
+  transition: all 0.2s ease;
+}
+
+.ha-topic-btn:hover:not(:disabled) {
+  background: #FFD24D;
+  border-color: #FFD24D;
+}
+
+.ha-topic-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .ha-input-bar {
@@ -166,6 +177,10 @@
   background: transparent;
 }
 
+.ha-input::placeholder {
+  color: #ccc;
+}
+
 .ha-send-btn {
   width: 40px;
   height: 40px;
@@ -178,4 +193,32 @@
   align-items: center;
   justify-content: center;
   color: #1a1a1a;
+  transition: all 0.2s ease;
+  font-weight: bold;
+}
+
+.ha-send-btn:hover:not(:disabled) {
+  background: #FFC800;
+  transform: scale(1.05);
+}
+
+.ha-send-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.ha-send-btn:disabled {
+  background: #E8E8E8;
+  color: #999;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ha-error-msg {
+  background: #FFE6E6;
+  border: 1px solid #CC2222;
+  color: #CC2222;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  margin-bottom: 8px;
 }
