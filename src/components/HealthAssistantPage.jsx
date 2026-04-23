@@ -1,10 +1,12 @@
 // src/components/HealthAssistantPage.jsx
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useChat } from '@ai-sdk/react';
 import doctorAvatar from '../assets/doctor_avatar.png';
 import '../styles/HealthAssistantPage.css';
 
 const HealthAssistantPage = ({ onNavigate, user }) => {
+  const [error, setError] = useState(null);
+
   const { messages, input, setInput, handleInputChange, isLoading, append } = useChat({
     api: '/api/chat',
     initialMessages: [
@@ -14,6 +16,10 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
         content: 'Tentu! Aku disini untuk membantumu! Apa yang mau kau tanyakan tentang kesehatanmu?',
       },
     ],
+    onError: (err) => {
+      setError('Gagal mengirim pesan. Silakan coba lagi.');
+      console.error('Chat error:', err);
+    },
   });
 
   const bottomRef = useRef(null);
@@ -22,22 +28,27 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ✅ FIX: Ambil langsung dari state 'input' & proteksi undefined
+  // ✅ FIX: Check if input has actual content (not just whitespace)
+  const hasContent = input && input.trim().length > 0;
+  const isButtonEnabled = hasContent && !isLoading;
+
   const sendMessage = () => {
-    if (!input || !input.trim() || isLoading) return;
+    if (!hasContent || isLoading) return;
+    
+    setError(null); // Clear error when sending new message
     
     append({
       role: 'user',
-      content: input,
+      content: input.trim(),
     });
 
-    // ✅ FIX: Gunakan setInput bawaan SDK untuk clear field
     setInput('');
   };
 
   // ✅ Khusus Quick Topic tetap pakai parameter karena nilainya statis/luar state
   const handleQuickTopic = (prompt) => {
     if (isLoading) return;
+    setError(null);
     append({
       role: 'user',
       content: prompt,
@@ -63,6 +74,14 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
 
       <div className="ha-body">
         <div className="ha-chat-area">
+          {/* Error Message */}
+          {error && (
+            <div className="ha-error-msg">
+              {error}
+            </div>
+          )}
+
+          {/* Messages */}
           {messages.map((msg) => (
             <div key={msg.id} className={`ha-msg-row ${msg.role === 'user' ? 'ha-msg-user' : 'ha-msg-ai'}`}>
               {msg.role === 'assistant' && (
@@ -74,6 +93,7 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
             </div>
           ))}
 
+          {/* Loading Indicator */}
           {isLoading && (
             <div className="ha-msg-row ha-msg-ai">
               <img src={doctorAvatar} className="ha-avatar" alt="AI" />
@@ -104,20 +124,24 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
           className="ha-input"
           placeholder="Tulis pertanyaanmu..."
           value={input}
-          onChange={handleInputChange}
+          onChange={(e) => {
+            handleInputChange(e);
+            setError(null); // Clear error when typing
+          }}
           disabled={isLoading}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
-              sendMessage(); // ✅ Tanpa parameter
+              sendMessage();
             }
           }}
         />
         <button
           type="button"
           className="ha-send-btn"
-          disabled={isLoading || !input?.trim()} // ✅ Opsional chaining untuk amankan trim
-          onClick={sendMessage} // ✅ Langsung referensi fungsi
+          disabled={!isButtonEnabled}
+          onClick={sendMessage}
+          title={isLoading ? 'Menunggu respons...' : hasContent ? 'Kirim pesan' : 'Tulis pesan terlebih dahulu'}
         >
           →
         </button>
