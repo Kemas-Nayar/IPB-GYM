@@ -1,44 +1,22 @@
-// src/components/HealthAssistantPage.jsx
-import React, { useRef, useEffect, useState } from 'react';
-import { useChat } from '@ai-sdk/react';
+import React, { useState, useRef, useEffect } from 'react';
 import doctorAvatar from '../assets/doctor_avatar.png';
 import '../styles/HealthAssistantPage.css';
 
+const WELCOME = {
+  id: 'welcome-message',
+  role: 'assistant',
+  content: 'Tentu! Aku disini untuk membantumu! Apa yang mau kau tanyakan tentang kesehatanmu?',
+};
+
+const SYSTEM_PROMPT = `Kamu adalah Health Assistant bernama Nuri dari IPB Wellness Hub. 
+Kamu membantu pengguna dengan pertanyaan seputar kesehatan, gizi, olahraga, dan gaya hidup sehat. 
+Jawab dalam Bahasa Indonesia, ramah, dan informatif. Jangan memberikan diagnosis medis.`;
+
 const HealthAssistantPage = ({ onNavigate, user }) => {
-  const [error, setError] = useState(null);
-
-  // Mengambil fungsi bawaan (native) dari Vercel AI SDK
-  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
-    api: '/api/chat',
-    initialMessages: [
-      {
-        id: 'welcome-message',
-        role: 'assistant',
-        content: 'Tentu! Aku disini untuk membantumu! Apa yang mau kau tanyakan tentang kesehatanmu?',
-      },
-    ],
-    onError: (err) => {
-      setError('Gagal mengirim pesan. Silakan coba lagi.');
-      console.error('Chat error:', err);
-    },
-  });
-
+  const [messages, setMessages] = useState([WELCOME]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef(null);
-
-  // Otomatis scroll ke bawah setiap ada chat baru
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Fungsi khusus untuk Quick Topics (memakai append karena inputnya dari luar state text)
-  const handleQuickTopic = (prompt) => {
-    if (isLoading) return;
-    setError(null);
-    append({
-      role: 'user',
-      content: prompt,
-    });
-  };
 
   const quickTopics = [
     { label: '🍒 Tips Diet', prompt: 'Berikan tips diet sehat untuk saya' },
@@ -46,8 +24,74 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
     { label: '💤 Tidur', prompt: 'Bagaimana cara meningkatkan kualitas tidur saya?' },
   ];
 
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendMessage = async (text) => {
+    if (!text.trim() || isLoading) return;
+
+    const userMsg = { id: Date.now().toString(), role: 'user', content: text };
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
+    setInput('');
+    setIsLoading(true);
+
+    // Format history untuk Gemini (role: user/model, bukan assistant)
+    // Gemini tidak support system prompt di sini, jadi kita inject ke pesan pertama
+    const history = updatedMessages
+      .filter(m => m.id !== 'welcome-message')
+      .map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      }));
+
+    // Inject system prompt sebagai context di awal
+    const contents = [
+      { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },
+      { role: 'model', parts: [{ text: 'Baik, saya mengerti. Saya siap membantu!' }] },
+      ...history,
+    ];
+
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents }),
+        }
+      );
+
+      const data = await response.json();
+      const reply =
+        data?.candidates?.[0]?.content?.parts?.[0]?.text ??
+        'Maaf, aku tidak bisa menjawab saat ini.';
+
+      setMessages(prev => [
+        ...prev,
+        { id: Date.now().toString() + '-ai', role: 'assistant', content: reply },
+      ]);
+    } catch (err) {
+      console.error('Chat error:', err);
+      setMessages(prev => [
+        ...prev,
+        { id: Date.now().toString() + '-err', role: 'assistant', content: 'Maaf, terjadi kesalahan. Coba lagi ya!' },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    sendMessage(input);
+  };
+
   return (
     <div className="ha-page">
+      {/* Header */}
       <div className="ha-header">
         <button className="ha-back-btn" onClick={() => onNavigate('home')}>←</button>
         <div className="ha-header-text">
@@ -57,16 +101,9 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
         <button className="ha-help-btn">?</button>
       </div>
 
+      {/* Chat Area */}
       <div className="ha-body">
         <div className="ha-chat-area">
-          {/* Menampilkan pesan error jika internet/API bermasalah */}
-          {error && (
-            <div className="ha-error-msg">
-              {error}
-            </div>
-          )}
-
-          {/* Menampilkan Balon Chat */}
           {messages.map((msg) => (
             <div key={msg.id} className={`ha-msg-row ${msg.role === 'user' ? 'ha-msg-user' : 'ha-msg-ai'}`}>
               {msg.role === 'assistant' && (
@@ -78,7 +115,6 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
             </div>
           ))}
 
-          {/* Indikator Animasi Loading */}
           {isLoading && (
             <div className="ha-msg-row ha-msg-ai">
               <img src={doctorAvatar} className="ha-avatar" alt="AI" />
@@ -87,52 +123,30 @@ const HealthAssistantPage = ({ onNavigate, user }) => {
               </div>
             </div>
           )}
+
           <div ref={bottomRef} />
         </div>
 
-        {/* Tombol Topik Instan */}
+        {/* Quick Topics */}
         <div className="ha-quick-topics">
           {quickTopics.map((t, i) => (
-            <button 
-              key={i} 
-              className="ha-topic-btn" 
-              onClick={() => handleQuickTopic(t.prompt)} 
-              disabled={isLoading}
-            >
+            <button key={i} className="ha-topic-btn" onClick={() => sendMessage(t.prompt)} disabled={isLoading}>
               {t.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Input Form yang Super Aman 
-        - handleSubmit bawaan Vercel otomatis mereset input kotak teks
-        - <form> memastikan tombol Enter bekerja tanpa bentrok
-      */}
-      <form 
-        className="ha-input-bar" 
-        onSubmit={(e) => {
-          e.preventDefault(); 
-          if (!input?.trim() || isLoading) return; 
-          handleSubmit(e); 
-        }}
-      >
+      {/* Input Bar */}
+      <form className="ha-input-bar" onSubmit={handleSubmit}>
         <input
           className="ha-input"
           placeholder="Tulis pertanyaanmu..."
           value={input}
-          onChange={(e) => {
-            handleInputChange(e);
-            setError(null);
-          }}
+          onChange={(e) => setInput(e.target.value)}
           disabled={isLoading}
         />
-        <button
-          type="submit"
-          className="ha-send-btn"
-          disabled={!input?.trim() || isLoading}
-          title={isLoading ? 'Menunggu respons...' : 'Kirim pesan'}
-        >
+        <button type="submit" className="ha-send-btn" disabled={!input.trim() || isLoading}>
           →
         </button>
       </form>
