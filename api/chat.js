@@ -3,7 +3,7 @@ import { streamText } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
 const google = createGoogleGenerativeAI({
-  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || '',
+  apiKey: process.env.VITE_GEMINI_API_KEY || '',
 });
 
 // gunakan Web API handler
