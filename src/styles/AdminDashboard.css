@@ -1,0 +1,132 @@
+.admin-page {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f4f7f6;
+  font-family: 'Poppins', sans-serif;
+}
+
+.admin-sidebar {
+  width: 250px;
+  background-color: #1a202c;
+  color: white;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-sidebar h2 {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #48bb78;
+}
+
+.admin-menu {
+  list-style: none;
+  padding: 0;
+  flex-grow: 1;
+}
+
+.admin-menu li {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.admin-menu li:hover, .admin-menu li.active {
+  background-color: #2d3748;
+}
+
+.admin-logout-btn {
+  background-color: transparent;
+  border: 1px solid #e53e3e;
+  color: #e53e3e;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-logout-btn:hover {
+  background-color: #e53e3e;
+  color: white;
+}
+
+.admin-content {
+  flex-grow: 1;
+  padding: 30px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.refresh-btn {
+  background-color: white;
+  border: 1px solid #cbd5e0;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-card {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+  text-align: left;
+  padding: 12px 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-table th {
+  background-color: #f8fafc;
+  color: #4a5568;
+}
+
+.status-badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+}
+
+.status-pending { background-color: #feebc8; color: #dd6b20; }
+
+.action-btn {
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+  font-size: 0.85rem;
+}
+
+.approve { background-color: #c6f6d5; color: #22543d; }
+.reject { background-color: #fed7d7; color: #742a2a; }
+
+.status-approved { 
+  background-color: #c6f6d5; 
+  color: #22543d; 
+}
+
+.status-rejected { 
+  background-color: #fed7d7; 
+  color: #742a2a; 
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}

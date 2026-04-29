@@ -65,6 +65,16 @@ const HomePage = ({ onNavigate, user }) => {
   const firstName = profile?.nama_lengkap?.split(' ')[0] || user?.email?.split('@')[0] || 'User';
   const avatarInitial = firstName.charAt(0).toUpperCase();
 
+  const handleAdminLogin = () => {
+    const pin = prompt("🔒 Masukkan PIN Admin:");
+
+    if (pin === "ipb123") {
+      onNavigate('admin'); 
+    } else if (pin !== null) {
+      alert("❌ PIN Salah! Akses ditolak.");
+    }
+  };
+
   return (
     <div className="home-page">
 
@@ -219,8 +229,25 @@ const HomePage = ({ onNavigate, user }) => {
           </div>
         </div>
 
+      </div> {/* Ini adalah penutup div "home-cards" */}
+
+      {/* Tepat di bawah penutup home-cards, TAMBAHKAN KODE INI: */}
+      <div style={{ textAlign: 'center', marginTop: '30px', paddingBottom: '30px' }}>
+        <button 
+          onClick={handleAdminLogin} 
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#cbd5e0',
+            cursor: 'pointer',
+            fontSize: '0.85rem'
+          }}
+        >
+          Masuk sebagai Admin
+        </button>
       </div>
-    </div>
+
+    </div> // Ini adalah penutup div "home-page"
   );
 };
 

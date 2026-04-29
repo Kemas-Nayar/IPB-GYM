@@ -19,6 +19,7 @@ import HealthAssistantPage from './components/HealthAssistantPage';
 import GymReservationPage from './components/Gymreservationpage';
 import HealthModulePage from './components/Healthmodulepage';
 import QRScanPage from './components/QRScanPage';
+import AdminDashboard from './components/AdminDashboard';
 import "./styles/App.css";
 
 
@@ -143,6 +144,8 @@ export default function App() {
       {page === 'health-module'     && <HealthModulePage onNavigate={handleNavigate} user={user} />}
 
       {page === 'qr-scan'           && <QRScanPage onNavigate={handleNavigate} user={user} params={pageParams} />}
+
+      {page === 'admin'             && <AdminDashboard onNavigate={handleNavigate} />}
 
     </div>
 
