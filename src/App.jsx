@@ -43,6 +43,7 @@ const HealthAssistantPage  = lazy(() => import("./components/Healthassistantpage
 const HealthModulePage     = lazy(() => import("./components/Healthmodulepage"));
 const GymReservationPage   = lazy(() => import("./components/Gymreservationpage"));
 const QRScanPage           = lazy(() => import("./components/QRScanPage"));
+const AdminDashboard       = lazy(() => import("./components/AdminDashboard"));
 
 const PUBLIC_PAGES = ['landing', 'login', 'signup', 'forgot', 'reset-password'];
 
@@ -55,8 +56,6 @@ const PageLoader = () => (
 );
 
 // ─── MODULE-LEVEL URL PARSING ─────────────────────────────────────────────────
-// Dibaca SEBELUM React render apapun — sinkron
-// Ini penting agar hash fragment tidak hilang sebelum dibaca
 const parseAuthUrl = () => {
   const hash   = window.location.hash.substring(1);
   const search = window.location.search.substring(1);
@@ -76,7 +75,6 @@ console.log('[App] AUTH_URL:', AUTH_URL, '| IS_CB:', IS_CB);
 
 // ─── APP ──────────────────────────────────────────────────────────────────────
 export default function App() {
-  // Kalau ini auth callback → skip loading screen & set halaman awal langsung
   const [appReady,    setAppReady]    = useState(IS_CB);
   const [showLoading, setShowLoading] = useState(!IS_CB);
   const [user,        setUser]        = useState(null);
@@ -84,7 +82,6 @@ export default function App() {
   const [pageParams,  setPageParams]  = useState({});
   const [biodataTemp, setBiodataTemp] = useState(null);
 
-  // Halaman awal: kalau recovery link → langsung reset-password
   const [page, setPage] = useState(() => {
     if (IS_CB && AUTH_URL.type === 'recovery') return 'reset-password';
     return 'landing';
@@ -169,7 +166,6 @@ export default function App() {
           window.history.replaceState(null, '', window.location.pathname);
         }
 
-        // Hanya handle recovery (reset password) dari URL
         if (type === 'recovery' && accessToken) {
           const { error } = await supabase.auth.setSession({
             access_token:  accessToken,
@@ -182,13 +178,11 @@ export default function App() {
           return;
         }
 
-        // Error dari Supabase
         if (errorDesc) {
           if (isMounted) { setPage('login'); setAppReady(true); }
           return;
         }
 
-        // Normal session check
         const { data: { session } } = await supabase.auth.getSession();
         if (!isMounted) return;
 
@@ -221,7 +215,6 @@ export default function App() {
           if (sessionHandled.current) { sessionHandled.current = false; return; }
           await navigateAfterAuth(session.user.id, false);
         } else if (event === 'PASSWORD_RECOVERY') {
-          // Sudah dihandle via URL parsing di atas
           console.log('[App] PASSWORD_RECOVERY event (handled via URL)');
         } else if (event === 'SIGNED_OUT') {
           setProfile(null);
@@ -266,6 +259,7 @@ export default function App() {
             {page === 'health-module'     && <HealthModulePage onNavigate={handleNavigate} user={user} />}
             {page === 'gym-reservation'   && <GymReservationPage onNavigate={handleNavigate} user={user} />}
             {page === 'qr-scan'           && <QRScanPage onNavigate={handleNavigate} user={user} params={pageParams} />}
+            {page === 'admin'             && <AdminDashboard onNavigate={handleNavigate} user={user} />}
           </div>
         </Suspense>
       </ToastProvider>
