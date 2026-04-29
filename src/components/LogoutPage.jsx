@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../supabase';
 import '../styles/SubPage.css';
 
 const LogoutPage = ({ onNavigate }) => {
+  const [loading, setLoading] = useState(false);
+
   const handleLogout = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
+    // onAuthStateChange di App.jsx akan handle redirect ke 'landing'
+    // tapi tambahkan fallback manual jika tidak trigger
+    setLoading(false);
     onNavigate('landing');
   };
 
@@ -29,10 +35,10 @@ const LogoutPage = ({ onNavigate }) => {
         <h2 className="logout-title">Keluar dari Akun?</h2>
         <p className="logout-desc">Apakah anda yakin ingin keluar dari akun ini?</p>
 
-        <button className="btn-logout-red" onClick={handleLogout}>
-          Keluar
+        <button className="btn-logout-red" onClick={handleLogout} disabled={loading}>
+          {loading ? 'Keluar...' : 'Keluar'}
         </button>
-        <button className="btn-logout-cancel" onClick={() => onNavigate('profile')}>
+        <button className="btn-logout-cancel" onClick={() => onNavigate('profile')} disabled={loading}>
           Batal
         </button>
       </div>

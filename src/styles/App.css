@@ -1,30 +1,12 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  font-family: 'Poppins', sans-serif;
-}
-
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
+/* App-level layout */
 
 .main-content {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  justify-content: flex-start;
-  align-items: stretch;
   width: 100%;
-  font-size: 16px;
   color: #333;
+  background: #f5f5f5;
+  overflow-x: hidden;
+  font-family: 'Poppins', sans-serif;
 }

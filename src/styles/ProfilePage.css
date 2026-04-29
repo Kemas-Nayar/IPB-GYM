@@ -1,157 +1,201 @@
-.profile-page {
+/* ─── BASE ───────────────────────────────────────────────────────────────────── */
+.pp-page {
   min-height: 100vh;
-  background: #fdf0f0;
-  padding-bottom: 32px;
+  background: #F3F4F6;
+  padding-bottom: 40px;
+  font-family: 'Poppins', sans-serif;
 }
 
-.profile-header {
+/* ─── HEADER ─────────────────────────────────────────────────────────────────── */
+.pp-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 20px 16px 12px;
-  background: white;
+  justify-content: space-between;
+  padding: 18px 16px 14px;
+  background: #fff;
+  border-bottom: 1px solid #F3F4F6;
 }
 
-.profile-back {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-}
-
-.profile-header-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #222;
-}
-
-.profile-card {
-  background: white;
-  margin: 0 0 8px;
-}
-
-.profile-banner {
-  height: 60px;
-  background: #fce8e8;
-  border-radius: 0 0 16px 16px;
-
-  @media (min-width: 640px) {
-    height: 80px;
-    border-radius: 0 0 20px 20px;
-  }
-}
-
-.profile-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px 16px;
-
-  @media (min-width: 640px) {
-    gap: 14px;
-    padding: 16px 20px 20px;
-  }
-}
-
-.profile-avatar {
-  width: 48px;
-  height: 48px;
-  background: #C8102E;
-  color: white;
-  border-radius: 50%;
+.pp-back-btn {
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  border: 3px solid white;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  flex-shrink: 0;
-
-  @media (min-width: 640px) {
-    width: 60px;
-    height: 60px;
-    font-size: 22px;
-  }
+  background: #F3F4F6;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s;
 }
+.pp-back-btn:hover { background: #E5E7EB; }
 
-.profile-name {
+.pp-header-title {
   font-size: 16px;
   font-weight: 700;
-  color: #222;
+  color: #111827;
+}
+
+/* ─── PROFILE CARD ───────────────────────────────────────────────────────────── */
+.pp-card {
+  background: #fff;
+  margin-bottom: 10px;
+}
+
+.pp-banner {
+  height: 64px;
+  background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
+}
+
+.pp-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px 18px;
+}
+
+/* ─── AVATAR ─────────────────────────────────────────────────────────────────── */
+.pp-avatar-wrap {
+  margin-top: -28px;
+  flex-shrink: 0;
+}
+
+.pp-avatar-label {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  width: 64px;
+  height: 64px;
+}
+
+.pp-avatar-input {
+  display: none;
+}
+
+.pp-avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  display: block;
+}
+
+.pp-avatar-initial {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #374151;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+}
+
+.pp-avatar-edit-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  background: #111827;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.pp-avatar-loading {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  border: 3px solid transparent;
+  border-top-color: #fff;
+  animation: pp-spin 0.7s linear infinite;
+}
+@keyframes pp-spin { to { transform: rotate(360deg); } }
+
+.pp-name-wrap {
+  padding-top: 10px;
+}
+
+.pp-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
   margin: 0 0 2px;
-  line-height: 1.2;
-
-  @media (min-width: 640px) {
-    font-size: 18px;
-  }
 }
 
-.profile-email {
+.pp-email {
   font-size: 12px;
-  color: #888;
+  color: #9CA3AF;
   margin: 0;
-
-  @media (min-width: 640px) {
-    font-size: 13px;
-  }
 }
 
-.profile-section-label {
-  font-size: 12px;
-  color: #aaa;
-  padding: 10px 14px 4px;
-
-  @media (min-width: 640px) {
-    font-size: 13px;
-    padding: 12px 20px 6px;
-  }
+/*  SECTION LABEL  */
+.pp-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 10px 16px 6px;
 }
 
-.profile-menu-group {
-  background: white;
-  margin: 0 0 8px;
+/* ─── MENU GROUP ─────────────────────────────────────────────────────────────── */
+.pp-menu-group {
+  background: #fff;
+  border-radius: 14px;
+  margin: 0 12px 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
-.profile-menu-item {
+.pp-menu-item {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 14px;
+  padding: 14px 16px;
   background: none;
   border: none;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid #F9FAFB;
   cursor: pointer;
   text-align: left;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.12s;
+}
+.pp-menu-item:last-child  { border-bottom: none; }
+.pp-menu-item:hover       { background: #F9FAFB; }
+.pp-menu-item:active      { background: #F3F4F6; }
 
-  @media (min-width: 640px) {
-    gap: 14px;
-    padding: 16px 20px;
-  }
+.pp-menu-item--danger:hover { background: #FFF5F5; }
+
+.pp-menu-icon-wrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.profile-menu-item:last-child {
-  border-bottom: none;
-}
-
-.profile-menu-icon {
-  font-size: 20px;
-  width: 28px;
-  text-align: center;
-}
-
-.profile-menu-label {
+.pp-menu-label {
   flex: 1;
   font-size: 14px;
   font-weight: 600;
-  color: #222;
-
-  @media (min-width: 640px) {
-    font-size: 15px;
-  }
+  color: #111827;
 }
 
-.profile-menu-icon.red { color: #C8102E; }
-.profile-menu-label.red { color: #C8102E; }
+.pp-menu-label--danger {
+  color: #C8102E;
+}

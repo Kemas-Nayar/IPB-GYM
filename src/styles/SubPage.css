@@ -2,6 +2,7 @@
   min-height: 100vh;
   background: #f5f5f5;
   padding-bottom: 40px;
+  font-family: 'Poppins', sans-serif;
 }
 
 /* Header */
@@ -182,7 +183,9 @@
 
 .badge-yellow { background: #F2C94C; color: #333; }
 .badge-red    { background: #C8102E; color: white; }
+.badge-green  { background: #27AE60; color: white; }
 .badge-blue   { background: #2F5DAA; color: white; }
+.badge-gray   { background: #888;    color: white; }
 
 /* QR Button — clickable */
 .reservasi-qr {

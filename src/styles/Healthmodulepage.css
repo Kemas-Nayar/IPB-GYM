@@ -360,10 +360,11 @@
   position: relative;
   width: 100%;
   max-width: 480px;
-  aspect-ratio: 16/9;
   background: #000;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
+  padding-bottom: 56.25%; /* 16:9 ratio */
+  margin-bottom: 52px;   /* space for Tandai Selesai button */
 }
 
 .hm-video-close {
@@ -382,9 +383,12 @@
 }
 
 .hm-iframe {
+  position: absolute;
+  top: 0; left: 0;
   width: 100%;
   height: 100%;
   border: none;
+  border-radius: 12px;
 }
 
 /* ─── DETAIL PAGE ────────────────────────────────────────────────────────────── */

@@ -2,137 +2,138 @@ import React, { useRef, useEffect, useCallback } from 'react';
 
 const ITEM_HEIGHT = 44;
 const VISIBLE_ITEMS = 5;
+const PADDING = ITEM_HEIGHT * Math.floor(VISIBLE_ITEMS / 2); // 88px
 
 const PickerColumn = ({ items, selectedIndex, onSelect }) => {
   const columnRef = useRef(null);
-  const isScrolling = useRef(false);
   const scrollTimer = useRef(null);
+  const currentIndex = useRef(selectedIndex);
 
+  // Set posisi awal saat mount
   useEffect(() => {
     const el = columnRef.current;
     if (!el) return;
-    el.scrollTop = selectedIndex * ITEM_HEIGHT;
+    requestAnimationFrame(() => {
+      el.scrollTop = selectedIndex * ITEM_HEIGHT;
+    });
   }, []);
 
   const handleScroll = useCallback(() => {
     const el = columnRef.current;
     if (!el) return;
 
-    isScrolling.current = true;
-
     if (scrollTimer.current) clearTimeout(scrollTimer.current);
 
     scrollTimer.current = setTimeout(() => {
+      // scrollTop langsung = index * ITEM_HEIGHT karena padding pakai div terpisah
       const rawIndex = el.scrollTop / ITEM_HEIGHT;
-      const snappedIndex = Math.round(rawIndex);
-      const clamped = Math.max(0, Math.min(snappedIndex, items.length - 1));
+      const snapped = Math.round(rawIndex);
+      const clamped = Math.max(0, Math.min(snapped, items.length - 1));
 
-      // Snap halus ke posisi
+      if (clamped !== currentIndex.current) {
+        currentIndex.current = clamped;
+        onSelect(clamped);
+      }
+
       el.scrollTo({ top: clamped * ITEM_HEIGHT, behavior: 'smooth' });
-      onSelect(clamped);
-      isScrolling.current = false;
     }, 80);
   }, [items, onSelect]);
 
   const handleItemClick = (index) => {
     const el = columnRef.current;
     if (!el) return;
-    el.scrollTo({ top: index * ITEM_HEIGHT, behavior: 'smooth' });
+    currentIndex.current = index;
     onSelect(index);
+    el.scrollTo({ top: index * ITEM_HEIGHT, behavior: 'smooth' });
   };
 
   return (
     <div className="picker-column-wrap">
-      {/* Gradient fade atas */}
       <div className="picker-fade picker-fade-top" />
-
-      {/* Highlight tengah */}
       <div className="picker-highlight" />
 
-      {/* Scrollable column */}
       <div
         ref={columnRef}
         className="picker-column"
         onScroll={handleScroll}
       >
-        {/* Padding atas */}
-        <div style={{ height: ITEM_HEIGHT * 2 }} />
+        {/* Spacer atas — sama persis dengan PADDING */}
+        <div style={{ height: PADDING, flexShrink: 0 }} />
 
         {items.map((item, index) => (
           <div
             key={index}
             className="picker-item"
-            style={{ height: ITEM_HEIGHT }}
             onClick={() => handleItemClick(index)}
           >
             {item}
           </div>
         ))}
 
-        {/* Padding bawah */}
-        <div style={{ height: ITEM_HEIGHT * 2 }} />
+        {/* Spacer bawah */}
+        <div style={{ height: PADDING, flexShrink: 0 }} />
       </div>
 
-      {/* Gradient fade bawah */}
       <div className="picker-fade picker-fade-bottom" />
     </div>
   );
 };
 
-const DatePicker = ({ value, onChange, onCancel, onDone }) => {
+const DatePicker = ({ value, onCancel, onDone }) => {
   const months = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
   ];
-  const days = Array.from({ length: 31 }, (_, i) => String(i + 1));
+  const days  = Array.from({ length: 31 }, (_, i) => String(i + 1));
   const years = Array.from({ length: 56 }, (_, i) => String(1970 + i));
 
-  const defaultDate = value || new Date(2000, 0, 1);
-  const defaultDayIndex = defaultDate.getDate() - 1;
-  const defaultMonthIndex = defaultDate.getMonth();
-  const defaultYearIndex = years.indexOf(String(defaultDate.getFullYear()));
+  // Hitung default index dari value
+  const defaultDate  = value instanceof Date && !isNaN(value) ? value : new Date(2000, 0, 1);
+  const initDay      = defaultDate.getDate() - 1;
+  const initMonth    = defaultDate.getMonth();
+  const initYearIdx  = years.indexOf(String(defaultDate.getFullYear()));
+  const initYear     = initYearIdx >= 0 ? initYearIdx : years.indexOf('2000');
 
-  const selectedDay = useRef(defaultDayIndex);
-  const selectedMonth = useRef(defaultMonthIndex);
-  const selectedYear = useRef(defaultYearIndex >= 0 ? defaultYearIndex : 30);
+  const selectedDay   = useRef(initDay);
+  const selectedMonth = useRef(initMonth);
+  const selectedYear  = useRef(initYear);
 
   const handleDone = () => {
-    const day = selectedDay.current + 1;
+    const day   = selectedDay.current + 1;
     const month = selectedMonth.current;
-    const year = parseInt(years[selectedYear.current]);
-    onDone(new Date(year, month, day));
+    const year  = parseInt(years[selectedYear.current]);
+
+    // Clamping hari agar tidak melebihi hari max di bulan tsb
+    const maxDay  = new Date(year, month + 1, 0).getDate();
+    const safeDay = Math.min(day, maxDay);
+
+    onDone(new Date(year, month, safeDay));
   };
 
   return (
-    <div className="datepicker-overlay">
+    <div className="datepicker-overlay" onClick={(e) => e.target === e.currentTarget && onCancel()}>
       <div className="datepicker-modal">
 
-        {/* Header */}
         <div className="datepicker-header">
-          <button className="datepicker-cancel" onClick={onCancel}>
-            Cancel
-          </button>
+          <button className="datepicker-cancel" onClick={onCancel}>Cancel</button>
           <span className="datepicker-title">Tanggal Lahir</span>
-          <button className="datepicker-done" onClick={handleDone}>
-            Done
-          </button>
+          <button className="datepicker-done" onClick={handleDone}>Done</button>
         </div>
 
-        {/* Picker body */}
         <div className="datepicker-body">
           <PickerColumn
             items={days}
-            selectedIndex={selectedDay.current}
+            selectedIndex={initDay}
             onSelect={(i) => { selectedDay.current = i; }}
           />
           <PickerColumn
             items={months}
-            selectedIndex={selectedMonth.current}
+            selectedIndex={initMonth}
             onSelect={(i) => { selectedMonth.current = i; }}
           />
           <PickerColumn
             items={years}
-            selectedIndex={selectedYear.current}
+            selectedIndex={initYear}
             onSelect={(i) => { selectedYear.current = i; }}
           />
         </div>
